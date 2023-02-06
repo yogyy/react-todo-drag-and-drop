@@ -1,30 +1,32 @@
-import { useState } from "react";
-import "./App.css";
-import CustomForm from "./component/CustomForm";
-import EditForm from "./component/EditForm";
-import { TaskList } from "./component/TaskList";
-import useLocalStorage from "./hooks/useLocalStorage";
+import { useEffect, useState } from 'react';
+import './App.css';
+import CustomForm from './component/CustomForm';
+import EditForm from './component/EditForm';
+import { TaskList } from './component/TaskList';
+import useLocalStorage from './hooks/useLocalStorage';
+import ParticlesComponent from './component/Particle';
+import particlesConfig from './config/partilce-config';
 
 function App() {
-  const [tasks, setTasks] = useLocalStorage("react-todo.tasks", []);
+  const [tasks, setTasks] = useLocalStorage('react-todo.tasks', []);
   const [prevFocusEl, setPrevFocusEl] = useState(null);
   const [editedTask, setEditedTask] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
 
-  const addTask = (task) => {
-    setTasks((prevState) => [...prevState, task]);
+  const addTask = task => {
+    setTasks(prevState => [...prevState, task]);
   };
-  const deleteTask = (id) => {
-    setTasks((prevState) => prevState.filter((t) => t.id !== id));
+  const deleteTask = id => {
+    setTasks(prevState => prevState.filter(t => t.id !== id));
   };
-  const toggleTask = (id) => {
-    setTasks((prevState) =>
-      prevState.map((t) => (t.id === id ? { ...t, checked: !t.checked } : t))
+  const toggleTask = id => {
+    setTasks(prevState =>
+      prevState.map(t => (t.id === id ? { ...t, checked: !t.checked } : t))
     );
   };
-  const updateTask = (task) => {
-    setTasks((prevState) =>
-      prevState.map((t) => (t.id === task.id ? { ...t, name: task.name } : t))
+  const updateTask = task => {
+    setTasks(prevState =>
+      prevState.map(t => (t.id === task.id ? { ...t, name: task.name } : t))
     );
     closeEditMode();
   };
@@ -34,7 +36,7 @@ function App() {
     prevFocusEl.focus();
   };
 
-  const enterEditMode = (task) => {
+  const enterEditMode = task => {
     setEditedTask(task);
     setIsEditing(true);
     setPrevFocusEl(document.activeElement);
@@ -61,6 +63,7 @@ function App() {
           enterEditMode={enterEditMode}
         />
       )}
+      <ParticlesComponent id="tsparticles" />
     </div>
   );
 }

@@ -30,7 +30,8 @@
   border-radius: var(--_radius);
   width: 1em;
   height: 1em;
-  background-color: hsl(var(--muted));
+  /* background-color: hsl(var(--muted)); */
+  background: rgba(0, 0, 0, 0.5);
   border-radius: var(--_radius);
   box-shadow: 0 0 0.5em hsl(var(--accent) / 0.1),
     0 0 0 0.05em hsl(var(--accent) / 0.5), 0 0 0 -0.2em hsl(var(--accent));
@@ -48,7 +49,7 @@
 }
 
 .checkmark {
-  content: "";
+  content: '';
   position: absolute;
   width: 1em;
   height: 1em;
