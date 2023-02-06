@@ -7,6 +7,8 @@
   border: 0.2em solid hsl(var(--muted) / 0.8);
   padding: 0.6em;
   border-radius: calc(var(--_radius) * 2);
+  box-shadow: 0.05em 0.1em 0.9em hsl(var(--bg) / 0.3);
+  /* 0 0 0 -0.1em hsl(var(--bg)), 0 0 0 -0.2em hsl(var(--accent)); */
 }
 
 .task-group {

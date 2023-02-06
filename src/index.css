@@ -18,8 +18,8 @@ label {
 }
 
 :root {
-  --_hue: 606;
-  --_size: 1.8rem;
+  --_hue: 195;
+  --_size: 1.1rem;
   --_radius: 0.2em;
   --_tspeed_fast: 180ms;
   --_tspeed_slow: 300ms;
@@ -119,6 +119,8 @@ h1 {
   gap: clamp(2rem, 3.5vmax, 8rem);
   text-align: center;
   color: hsl(var(--accent));
+  max-height: 100%;
+  width: 400px;
 }
 
 hr {
@@ -206,13 +208,17 @@ hr {
   /* background-color: hsl(var(--muted)); */
   background-color: rgba(0, 0, 0, 0.5);
   caret-color: hsl(var(--accent));
-  box-shadow: 0 0 0 -0.1em hsl(var(--bg)), 0 0 0 -0.2em hsl(var(--accent) / 0.8);
+  /* box-shadow: 0 0 0 -0.1em hsl(var(--bg)), 0 0 0 -0.2em hsl(var(--accent) / 0.8); */
+  box-shadow: 0.05em 0.1em 0.9em hsl(var(--accent) / 0.3),
+    0 0 0 -0.1em hsl(var(--bg)), 0 0 0 -0.2em hsl(var(--accent));
   transition: box-shadow var(--_tspeed_fast) var(--_ttype_squish);
 }
 
 .input:focus {
   outline: none;
-  box-shadow: 0 0 0 0.2em hsl(var(--bg)), 0 0 0 0.4em hsl(var(--accent) / 0.8);
+  /* box-shadow: 0 0 0 0.2em hsl(var(--bg)), 0 0 0 0.4em hsl(var(--accent) / 0.8); */
+  box-shadow: 0.05em 0.1em 0.9em hsl(var(--accent) / 0.3),
+    0 0 0 -0.1em hsl(var(--bg)), 0 0 0 -0.2em hsl(var(--accent));
 }
 
 .input:focus ~ .label,
@@ -234,7 +240,7 @@ hr {
   padding-inline: 2vmax;
   display: grid;
   place-items: center;
-  /* background-color: hsl(var(--bg) / 0.7); */
+  background-color: hsl(var(--bg) / 0.7);
 }
 
 [role='dialog'] .todo {
@@ -245,4 +251,16 @@ hr {
   border-radius: var(--_radius);
   border: 0.1em solid hsl(var(--accent) / 0.3);
   box-shadow: 0 -1em 3em hsl(var(--muted)), 0 1em 3em hsl(var(--accent) / 0.2);
+}
+
+@media screen and (min-width: 500px) {
+  .todo {
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 768) {
+  .container {
+    height: 100vh;
+  }
 }

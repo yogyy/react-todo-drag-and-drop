@@ -27,7 +27,7 @@ const ParticlesComponent = props => {
           },
         },
         color: {
-          value: '#ffffff',
+          value: '#fff',
         },
         shape: {
           type: 'circle',
@@ -67,7 +67,7 @@ const ParticlesComponent = props => {
         line_linked: {
           enable: true,
           distance: 150,
-          color: '#6495ED',
+          color: '#409FBF',
           opacity: 0.4,
           width: 1,
         },
@@ -95,13 +95,13 @@ const ParticlesComponent = props => {
           },
           onclick: {
             enable: true,
-            mode: 'push',
+            mode: 'repulse',
           },
           resize: true,
         },
         modes: {
           grab: {
-            distance: 200,
+            distance: 300,
             line_linked: {
               opacity: 1,
             },
