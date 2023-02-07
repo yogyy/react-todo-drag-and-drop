@@ -1,6 +1,6 @@
 import Particles from 'react-tsparticles';
 import { loadSlim } from 'tsparticles-slim'; // loads tsparticles-slim
-//import { loadFull } from "tsparticles"; // loads tsparticles
+// import { loadFull } from "tsparticles"; // loads tsparticles
 import { useCallback, useMemo } from 'react';
 
 // tsParticles Repository: https://github.com/matteobruni/tsparticles
@@ -87,7 +87,7 @@ const ParticlesComponent = props => {
         },
       },
       interactivity: {
-        detect_on: 'window',
+        detect_on: 'canvas',
         events: {
           onhover: {
             enable: true,
@@ -97,7 +97,7 @@ const ParticlesComponent = props => {
             enable: true,
             mode: 'repulse',
           },
-          resize: true,
+          resize: false,
         },
         modes: {
           grab: {

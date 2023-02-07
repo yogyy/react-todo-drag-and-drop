@@ -5,7 +5,14 @@
   margin: 0;
   padding: 0;
 }
-
+/* canvas {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  z-index: -10;
+  visibility: visible;
+} */
 button {
   font: inherit;
   border: none;
@@ -260,14 +267,6 @@ hr {
 @media screen and (max-width: 450px) {
   .container {
     width: auto;
-  }
-  canvas {
-    position: fixed;
-    left: 0;
-    right: 0;
-    top: 0;
-    z-index: -10;
-    visibility: visible;
   }
 }
 
