@@ -1,19 +1,19 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 
 // library import
-import { DocumentPlusIcon } from "@heroicons/react/24/solid";
+import { DocumentPlusIcon } from '@heroicons/react/24/solid';
 
 export default function CustomForm({ addTask }) {
-  const [task, setTask] = useState("");
+  const [task, setTask] = useState('');
 
-  const handleForm = (e) => {
+  const handleForm = e => {
     e.preventDefault();
     addTask({
       name: task,
       checked: false,
       id: Date.now(),
     });
-    setTask("");
+    setTask('');
   };
   return (
     <form className="todo" onSubmit={handleForm}>
@@ -23,9 +23,8 @@ export default function CustomForm({ addTask }) {
           id="task"
           className="input"
           value={task}
-          onInput={(e) => setTask(e.target.value)}
+          onInput={e => setTask(e.target.value)}
           required
-          autoFocus
           maxLength={60}
           placeholder="Enter Task"
         />

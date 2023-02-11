@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import './App.css';
 import CustomForm from './component/CustomForm';
 import EditForm from './component/EditForm';
 import { TaskList } from './component/TaskList';
 import useLocalStorage from './hooks/useLocalStorage';
 import ParticlesComponent from './component/Particle';
-import particlesConfig from './config/partilce-config';
+import EditableTitle from './component/Title';
 
 function App() {
   const [tasks, setTasks] = useLocalStorage('react-todo.tasks', []);
@@ -43,27 +43,29 @@ function App() {
   };
 
   return (
-    <div className="container">
-      <header>
-        <h1>My Task List</h1>
-      </header>
-      {isEditing && (
-        <EditForm
-          editedTask={editedTask}
-          updateTask={updateTask}
-          closeEditMode={closeEditMode}
-        />
-      )}
-      <CustomForm addTask={addTask} />
-      {tasks && (
-        <TaskList
-          tasks={tasks}
-          deleteTask={deleteTask}
-          toggleTask={toggleTask}
-          enterEditMode={enterEditMode}
-        />
-      )}
-      <ParticlesComponent id="tsparticles" />
+    <div className="">
+      <div className="container">
+        <ParticlesComponent id="tsparticles" />
+        <header>
+          <EditableTitle />
+        </header>
+        {isEditing && (
+          <EditForm
+            editedTask={editedTask}
+            updateTask={updateTask}
+            closeEditMode={closeEditMode}
+          />
+        )}
+        <CustomForm addTask={addTask} />
+        {tasks && (
+          <TaskList
+            tasks={tasks}
+            deleteTask={deleteTask}
+            toggleTask={toggleTask}
+            enterEditMode={enterEditMode}
+          />
+        )}
+      </div>
     </div>
   );
 }

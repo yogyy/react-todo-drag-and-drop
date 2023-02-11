@@ -20,7 +20,7 @@ const ParticlesComponent = props => {
       },
       particles: {
         number: {
-          value: 20,
+          value: 30,
           density: {
             enable: true,
             value_area: 400,
@@ -58,7 +58,7 @@ const ParticlesComponent = props => {
           value: 3,
           random: true,
           anim: {
-            enable: false,
+            enable: true,
             speed: 40,
             size_min: 0.1,
             sync: false,
@@ -97,7 +97,7 @@ const ParticlesComponent = props => {
             enable: true,
             mode: 'repulse',
           },
-          resize: false,
+          resize: true,
         },
         modes: {
           grab: {

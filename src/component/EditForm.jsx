@@ -1,23 +1,23 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 
 // library import
-import { CheckIcon } from "@heroicons/react/24/solid";
+import { CheckIcon } from '@heroicons/react/24/solid';
 
 export default function EditForm({ editedTask, updateTask, closeEditMode }) {
   const [updatedTaskName, setUpdatedTaskName] = useState(editedTask.name);
 
   useEffect(() => {
-    const closeModalIfEscaped = (e) => {
-      e.key === "Escape" && closeEditMode();
+    const closeModalIfEscaped = e => {
+      e.key === 'Escape' && closeEditMode();
     };
-    window.addEventListener("keydown", closeModalIfEscaped);
+    window.addEventListener('keydown', closeModalIfEscaped);
 
     return () => {
-      window.removeEventListener("keydown", closeModalIfEscaped);
+      window.removeEventListener('keydown', closeModalIfEscaped);
     };
   }, [closeEditMode]);
 
-  const handleForm = (e) => {
+  const handleForm = e => {
     e.preventDefault();
     updateTask({ ...editedTask, name: updatedTaskName });
   };
@@ -25,7 +25,7 @@ export default function EditForm({ editedTask, updateTask, closeEditMode }) {
     <div
       role="dialog"
       aria-labelledby="editTask"
-      onClick={(e) => {
+      onClick={e => {
         e.target === e.currentTarget && closeEditMode(); // keluar dari kotak (close edit)
       }}
     >
@@ -36,14 +36,14 @@ export default function EditForm({ editedTask, updateTask, closeEditMode }) {
             id="editTask"
             className="input"
             value={updatedTaskName}
-            onInput={(e) => setUpdatedTaskName(e.target.value)}
+            onInput={e => setUpdatedTaskName(e.target.value)}
             required
             autoFocus
             maxLength={60}
             placeholder="Update Task"
           />
           <label htmlFor="ediTask" className="label">
-            Enter Task
+            Edit Task
           </label>
         </div>
         <button

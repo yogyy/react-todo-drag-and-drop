@@ -108,6 +108,7 @@ body {
     Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   background-color: hsl(var(--bg));
   color: hsl(var(--bg));
+  position: relative;
 }
 
 ::selection {
@@ -129,9 +130,16 @@ h1 {
   max-height: 100%;
   width: 400px;
 }
-.particles-js-canvas-el {
-  height: 100vmax !important;
-  z-index: 0;
+
+canvas {
+  display: block;
+  position: fixed;
+}
+
+#tsparticles-js {
+  position: absolute;
+  width: 100%;
+  height: 100%;
 }
 
 hr {
@@ -224,6 +232,25 @@ hr {
     0 0 0 -0.1em hsl(var(--bg)), 0 0 0 -0.2em hsl(var(--accent));
   transition: box-shadow var(--_tspeed_fast) var(--_ttype_squish);
 }
+.titlecontainer {
+  padding-top: 5%;
+  display: flex;
+  text-transform: capitalize;
+  justify-content: space-between;
+}
+
+.inputtitle {
+  background-color: rgba(0, 0, 0, 0.5);
+  border: none;
+  caret-color: hsl(var(--accent));
+  box-shadow: none;
+  width: 100%;
+}
+.inputtitle:where(:active, :focus) {
+  outline: red;
+  box-shadow: 0.05em 0.1em 0.9em hsl(var(--accent) / 0.3),
+    0 0 0 -0.1em hsl(var(--bg)), 0 0 0 -0.2em hsl(var(--accent));
+}
 
 .input:focus {
   outline: none;
@@ -270,8 +297,23 @@ hr {
   }
 }
 
-@media screen and (max-width: 768) {
+@media screen and (max-width: 768px) {
+  body {
+    background: #000;
+  }
+  #tsparticles {
+    width: 100%;
+    position: absolute;
+    background-position: 50% 50%;
+  }
+  .particles-js {
+    width: 100%;
+    background-size: cover;
+    background-position: 50% 50%;
+    position: absolute;
+    z-index: 0;
+  }
   .container {
-    height: 100vh;
+    margin: 20px;
   }
 }
