@@ -17,10 +17,11 @@ module.exports = {
     },
     extend: {
       colors: {
-        bg: '#010305',
-        primary: '#c26019',
-        secondary: '#1d2d06',
-        accent: '#e26f1d',
+        txt: '#ebebeb',
+        bg: '#080808',
+        primary: '#999999',
+        secondary: '#262626',
+        accent: '#8C8C8C',
       },
       keyframes: {
         'accordion-down': {
