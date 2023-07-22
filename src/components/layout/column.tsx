@@ -1,5 +1,5 @@
 import { useState, useRef, forwardRef, DetailedHTMLProps } from 'react';
-import { useStore } from '@/store/store';
+import { TaskStatus, useStore } from '@/store/store';
 import { Variant } from '../ui/badge';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Task from './task';
@@ -17,14 +17,16 @@ import {
 import { useForm } from 'react-hook-form';
 import { cn } from '@/lib/utils';
 import Modal from './modal';
+import { Droppable } from '@hello-pangea/dnd';
 
 interface ColumnProps
   extends DetailedHTMLProps<
     React.HTMLAttributes<HTMLDivElement>,
     HTMLDivElement
   > {
-  state: string;
+  state: TaskStatus;
   variant: Variant;
+  droppableId: string;
 }
 const formSchema = z.object({
   task: z
@@ -36,16 +38,12 @@ const formSchema = z.object({
 });
 
 const Column = forwardRef<HTMLDivElement, ColumnProps>(
-  ({ state, variant }, ref) => {
+  ({ state, variant, droppableId }, ref) => {
     const [isOpen, setIsOpen] = useState(false);
-    const [drop, setDrop] = useState(false);
     const tasks = useStore(store =>
       store.tasks.filter(task => task.state === state)
     );
-    const draggedTask = useStore(store => store.draggedTask);
     const addTask = useStore(store => store.addTask);
-    const setDraggedTask = useStore(store => store.setDraggedTask);
-    const moveTask = useStore(store => store.moveTask);
 
     const form = useForm<z.infer<typeof formSchema>>({
       resolver: zodResolver(formSchema),
@@ -76,22 +74,8 @@ const Column = forwardRef<HTMLDivElement, ColumnProps>(
         ref={ref}
         className={cn(
           'bg-secondary min-h-[20rem] md:max-w-[20rem] h-full rounded-md sm:w-[50%] w-[calc(100%_-_20px)] md:w-1/3 p-1 m-2',
-          'border-dashed border-2 border-transparent',
-          drop && 'border-accent'
+          'border-dashed border-2 border-transparent'
         )}
-        onDragOver={e => {
-          e.preventDefault();
-          setDrop(true);
-        }}
-        onDragLeave={e => {
-          e.preventDefault();
-          setDrop(false);
-        }}
-        onDrop={() => {
-          moveTask(draggedTask!, state);
-          setDraggedTask(null);
-          setDrop(false);
-        }}
       >
         <div className="flex items-center justify-between mx-2 mb-3">
           <div className="font-semibold">
@@ -140,10 +124,26 @@ const Column = forwardRef<HTMLDivElement, ColumnProps>(
             </Form>
           </Modal>
         </div>
-        <div className="flex flex-col gap-1.5">
-          {tasks.map((task, _i) => (
-            <Task key={task.title + _i} title={task.title} variant={variant} />
-          ))}
+        <div>
+          <Droppable droppableId={droppableId}>
+            {provided => (
+              <div
+                {...provided.droppableProps}
+                ref={provided.innerRef}
+                className="flex flex-col w-full min-h-[20rem]"
+              >
+                {tasks.map((task, index) => (
+                  <Task
+                    index={index}
+                    key={task.id}
+                    id={task.id}
+                    variant={variant}
+                  />
+                ))}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
         </div>
       </div>
     );
