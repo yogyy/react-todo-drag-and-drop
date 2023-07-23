@@ -6,7 +6,7 @@ const Navbar = () => {
   useEffect(() => {}, []);
   return (
     <>
-      <div className="h-16 bg-sky-400 flex justify-start gap-3 text-2xl items-center pl-20 sticky top-0 font-serif z-20">
+      <div className="sticky top-0 z-20 flex items-center justify-start h-16 gap-3 pl-20 font-serif text-2xl bg-secondary">
         <NavLink to="/">home</NavLink>
         <NavLink to="/root">root</NavLink>
       </div>

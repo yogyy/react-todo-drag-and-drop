@@ -1,21 +1,24 @@
 import Column from '@/components/layout/column';
 import { DragDropContext, DropResult } from '@hello-pangea/dnd';
-import { Task, useStore } from './store/store';
+import { useStore } from './store/store';
 import './App.css';
 
 function App() {
-  // const { tasks, moveTask } = useStore();
-  // const [todos, setTodos] = useState(tasks);
   const tasks = useStore(store => store.tasks);
-  const moveTask = useStore(store => store.moveTask);
+  const orderTask = useStore(store => store.moveTaskBetweenCategories);
 
   function handleOnDragEnd(result: DropResult) {
-    const { destination, source } = result;
+    const { destination, source, draggableId } = result;
     if (!destination) return;
+    if (
+      destination.droppableId === source.droppableId &&
+      destination.index === source.index
+    ) {
+      return console.info(tasks);
+    }
 
-    // let add,active = tasks
-    console.log(tasks, tasks[0], null, 2);
-    moveTask(result.draggableId, destination.droppableId);
+    orderTask(draggableId, destination.droppableId, destination.index);
+    // moveTask(result.draggableId, destination.droppableId);
     // console.log(source, 'to', destination);
   }
 

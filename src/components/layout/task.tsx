@@ -14,7 +14,7 @@ interface Task
   index: number;
 }
 
-const Task = forwardRef<HTMLDivElement, Task>(({ id, variant, index }, ref) => {
+const Task = forwardRef<HTMLDivElement, Task>(({ id, variant, index }) => {
   const task = useStore(store => store.tasks.find(task => task.id === id));
   const deleteTask = useStore(store => store.deleteTask);
   return (
