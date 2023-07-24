@@ -1,7 +1,7 @@
 import { useStore } from '@/store/store';
 import { Badge, Variant } from '../ui/badge';
 import { TrashIcon } from '@radix-ui/react-icons';
-import { DetailedHTMLProps, forwardRef } from 'react';
+import { DetailedHTMLProps } from 'react';
 import { Draggable } from '@hello-pangea/dnd';
 
 interface Task
@@ -14,7 +14,8 @@ interface Task
   index: number;
 }
 
-const Task = forwardRef<HTMLDivElement, Task>(({ id, variant, index }) => {
+const Task = (props: Task) => {
+  const { id, variant, index } = props;
   const task = useStore(store => store.tasks.find(task => task.id === id));
   const deleteTask = useStore(store => store.deleteTask);
   return (
@@ -24,7 +25,6 @@ const Task = forwardRef<HTMLDivElement, Task>(({ id, variant, index }) => {
           {...provided.draggableProps}
           {...provided.dragHandleProps}
           ref={provided.innerRef}
-          // onClick={() => console.log(task!.id)}
           className="relative bg-[#131313] rounded-md min-h-[5rem] h-auto p-3 flex flex-col justify-between my-0.5"
         >
           <div className="w-full h-full">
@@ -46,6 +46,6 @@ const Task = forwardRef<HTMLDivElement, Task>(({ id, variant, index }) => {
       )}
     </Draggable>
   );
-});
+};
 
 export default Task;
