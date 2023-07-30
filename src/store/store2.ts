@@ -13,6 +13,7 @@ type Store = {
   deleteTodos: (id: string, state: TaskStatus) => void;
   moveTaskBetweenCategories: (
     taskId: string,
+    sourceCategory: string,
     targetCategory: string,
     targetIndex: number
   ) => void;
@@ -49,35 +50,30 @@ const useTodos = create<Store>()(
       },
       moveTaskBetweenCategories: (
         taskId: string,
+        sourceCategory: string,
         targetCategory: string,
         targetIndex: number
       ) =>
         set((store: Store) => {
           const { todos } = store;
-
-          const sourceCategory = Object.keys(todos).find(category =>
-            todos[category].some(task => task.id === taskId)
-          );
-
-          if (!sourceCategory || targetIndex < 0) {
-            // Invalid indices or categories, do nothing
-            return store; // Return the original store to avoid the error
-          }
-
           const sourceTasks = todos[sourceCategory];
+          const targetTasks = todos[targetCategory];
+
           const taskToMoveIndex = sourceTasks.findIndex(
             task => task.id === taskId
           );
 
-          if (taskToMoveIndex === -1 || targetIndex > sourceTasks.length) {
-            // Invalid indices, do nothing
+          if (
+            taskToMoveIndex === -1 ||
+            targetIndex < 0 ||
+            targetIndex > targetTasks.length
+          ) {
+            // Invalid indices or categories, do nothing
             return store; // Return the original store to avoid the error
           }
 
           const taskToMove = sourceTasks.splice(taskToMoveIndex, 1)[0];
-
-          // Move the task to the target category and reset its order
-          todos[targetCategory].splice(targetIndex, 0, {
+          targetTasks.splice(targetIndex, 0, {
             ...taskToMove,
             state: targetCategory,
           });
