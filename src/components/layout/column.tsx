@@ -1,5 +1,5 @@
 import { useState, useRef, forwardRef, DetailedHTMLProps } from 'react';
-import { TaskStatus, useStore } from '@/store/store';
+import { TaskStatus } from '@/store/store';
 import { Variant } from '../ui/badge';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Task from './task';
@@ -18,6 +18,7 @@ import { useForm } from 'react-hook-form';
 import { cn } from '@/lib/utils';
 import Modal from './modal';
 import { Droppable } from '@hello-pangea/dnd';
+import useTodos from '@/store/todoStore';
 
 interface ColumnProps
   extends DetailedHTMLProps<
@@ -38,12 +39,10 @@ const formSchema = z.object({
 });
 
 const Column = forwardRef<HTMLDivElement, ColumnProps>(
-  ({ state, variant, droppableId }, ref) => {
+  ({ state, variant, droppableId, className }, ref) => {
     const [isOpen, setIsOpen] = useState(false);
-    const tasks = useStore(store =>
-      store.tasks.filter(task => task.state === state)
-    );
-    const addTask = useStore(store => store.addTask);
+    const addTodo = useTodos(store => store.addTodos);
+    const todos = useTodos(store => store.todos[state]);
 
     const form = useForm<z.infer<typeof formSchema>>({
       resolver: zodResolver(formSchema),
@@ -64,7 +63,7 @@ const Column = forwardRef<HTMLDivElement, ColumnProps>(
     }
 
     function onSubmit(values: z.infer<typeof formSchema>) {
-      addTask(values.task, state);
+      addTodo(values.task, state);
       closeModal();
       form.reset();
     }
@@ -73,11 +72,11 @@ const Column = forwardRef<HTMLDivElement, ColumnProps>(
       <div
         ref={ref}
         className={cn(
-          'bg-secondary min-h-[20rem] md:max-w-[20rem] h-full rounded-md sm:w-[50%] w-[calc(100%_-_20px)] md:w-1/3 p-1 m-2',
-          'border-dashed border-2 border-transparent'
+          'bg-secondary min-h-[20rem] md:max-w-[20rem] h-full rounded-md sm:w-[50%] w-[calc(100%_-_20px)] md:w-1/3 m-2',
+          className
         )}
       >
-        <div className="flex items-center justify-between mx-2 mb-3">
+        <div className="flex items-center justify-between mx-2 my-1.5">
           <div className="font-semibold">
             <h1>{state}</h1>
           </div>
@@ -126,18 +125,26 @@ const Column = forwardRef<HTMLDivElement, ColumnProps>(
         </div>
         <div>
           <Droppable droppableId={droppableId}>
-            {provided => (
+            {(provided, snapshot) => (
               <div
                 {...provided.droppableProps}
                 ref={provided.innerRef}
-                className="flex flex-col w-full min-h-[20rem]"
+                className={cn(
+                  'flex flex-col w-full min-h-[20rem] p-2',
+                  snapshot.draggingOverWith &&
+                    ((droppableId === 'planned' && 'bg-orange-300/40') ||
+                      (droppableId === 'ongoing' && 'bg-sky-300/40') ||
+                      (droppableId === 'done' && 'bg-green-500/30'))
+                )}
+                // onClick={() => console.log(snapshot)}
               >
-                {tasks.map((task, index) => (
+                {todos.map((task, index) => (
                   <Task
                     index={index}
                     key={task.id}
                     id={task.id}
                     variant={variant}
+                    state={state}
                   />
                 ))}
                 {provided.placeholder}
