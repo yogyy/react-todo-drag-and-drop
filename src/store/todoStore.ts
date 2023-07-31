@@ -11,6 +11,7 @@ type Store = {
   todos: Todos;
   addTodos: (title: string, state: TaskStatus) => void;
   deleteTodos: (id: string, state: TaskStatus) => void;
+  editTodo: (taskId: string, newTitle: string) => void;
   moveTaskBetweenCategories: (
     taskId: string,
     sourceCategory: string,
@@ -46,6 +47,23 @@ const useTodos = create<Store>()(
               [state]: prev.todos[state].filter(task => task.id !== id),
             },
           };
+        });
+      },
+      editTodo: (taskId: string, newTitle: string) => {
+        set(store => {
+          const { todos } = store;
+          for (const category in todos) {
+            const tasks = todos[category];
+            const taskToEdit = tasks.find(task => task.id === taskId);
+
+            // If the task is found, update its title and break out of the loop
+            if (taskToEdit) {
+              taskToEdit.title = newTitle;
+              break;
+            }
+          }
+
+          return { todos: { ...todos } };
         });
       },
       moveTaskBetweenCategories: (
