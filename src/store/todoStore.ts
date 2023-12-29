@@ -103,4 +103,9 @@ const useTodos = create<Store>()(
   )
 );
 
-export default useTodos;
+const modalState = create<{ open: boolean; setOpen: () => void }>(set => ({
+  open: false,
+  setOpen: () => set(state => ({ open: !state.open })),
+}));
+
+export { useTodos, modalState };
