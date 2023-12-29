@@ -16,7 +16,7 @@ const router = createBrowserRouter(
       <Route index element={<App />} />
     </Route>
   ),
-  { basename: '/react-todo-localhost/' }
+  { basename: '/react-todo-drag-and-drop/' }
 );
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
