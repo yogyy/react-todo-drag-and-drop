@@ -1,6 +1,6 @@
 import { TaskStatus } from '@/store/store';
 import { Badge, Variant } from '../ui/badge';
-import { TrashIcon, Pencil1Icon } from '@radix-ui/react-icons';
+import { TrashIcon, Pencil2Icon } from '@radix-ui/react-icons';
 import { DetailedHTMLProps, useRef, useState } from 'react';
 import { Draggable } from '@hello-pangea/dnd';
 import useTodos from '@/store/todoStore';
@@ -103,7 +103,7 @@ const Task = (props: Task) => {
                 />
               </button>
               <button className="group" onClick={openModal}>
-                <Pencil1Icon
+                <Pencil2Icon
                   className="text-teal-50 rounded-md group-hover:bg-secondary p-0.5 transition-colors duration-300"
                   width={24}
                   height={24}
