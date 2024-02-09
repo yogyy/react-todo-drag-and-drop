@@ -2,10 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: SF;
+  src: url("/SF-Pro-Text-Regular.otf");
+  font-weight: 300;
+}
 @layer base {
   body {
-    background: #010305;
-    color: #ffffff;
+    background: #1d2125;
+    color: #b6c2cf;
+    font-family: SF;
   }
 }
 
@@ -96,7 +102,7 @@
   border-radius: 5px;
   padding: 20px;
   margin-top: 15px;
-  background-image: url('https://img.freepik.com/free-photo/crumpled-yellow-paper-background-close-up_60487-2390.jpg?size=626&ext=jpg');
+  background-image: url("https://img.freepik.com/free-photo/crumpled-yellow-paper-background-close-up_60487-2390.jpg?size=626&ext=jpg");
   transition: 0.2s;
 }
 
