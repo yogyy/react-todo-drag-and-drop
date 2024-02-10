@@ -1,10 +1,14 @@
-import { TaskStatus } from '@/store/store';
-import { Badge, Variant } from '../ui/badge';
-import { TrashIcon, Pencil2Icon } from '@radix-ui/react-icons';
-import { DetailedHTMLProps, useRef } from 'react';
-import { Draggable } from '@hello-pangea/dnd';
-import { modalState, useTodos } from '@/store/todoStore';
-import Modal from './modal';
+import { Badge, Variant } from "../ui/badge";
+import { TrashIcon, Pencil1Icon } from "@radix-ui/react-icons";
+import { DetailedHTMLProps, useRef, useState } from "react";
+import { Draggable } from "@hello-pangea/dnd";
+import { TaskStatus, useTodos } from "@/store/todoStore";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import {
   Form,
   FormControl,
@@ -12,14 +16,21 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Button } from '../ui/button';
-import { z } from 'zod';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Input } from '../ui/input';
-import { cn } from '@/lib/utils';
-
+} from "@/components/ui/form";
+import { Button } from "../ui/button";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Input } from "../ui/input";
+import { cn } from "@/lib/utils";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 interface Task
   extends DetailedHTMLProps<
     React.HTMLAttributes<HTMLDivElement>,
@@ -35,19 +46,19 @@ const formSchema = z.object({
   task: z
     .string()
     .min(2, {
-      message: 'task must be at least 2 characters.',
+      message: "task must be at least 2 characters.",
     })
     .max(100),
 });
 
 const Task = (props: Task) => {
   const { id, variant, index, state } = props;
-  const todo = useTodos(store =>
-    store.todos[state].find(task => task.id === id)
+  const todo = useTodos((store) =>
+    store.todos[state].find((task) => task.id === id)
   );
-  const deleteTodo = useTodos(store => store.deleteTodos);
-  const editTodo = useTodos(store => store.editTodo);
-  const closeModal = modalState(store => store.setOpen);
+  const deleteTodo = useTodos((store) => store.deleteTodos);
+  const editTodo = useTodos((store) => store.editTodo);
+  const [editModal, setEditModal] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -60,78 +71,97 @@ const Task = (props: Task) => {
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     editTodo(id, values.task);
-    closeModal();
+    setEditModal((prev) => !prev);
     form.reset();
   }
 
+  if (!todo) {
+    return;
+  }
+
   return (
-    <Draggable key={todo?.id!} draggableId={todo?.id!} index={index}>
+    <Draggable
+      key={todo?.id}
+      draggableId={todo?.id}
+      index={index}>
       {(provided, snapshot) => (
         <div
           {...provided.draggableProps}
           {...provided.dragHandleProps}
           ref={provided.innerRef}
           className={cn(
-            'relative bg-[#131313] rounded-md min-h-[5rem] h-auto p-3 flex flex-col justify-between my-0.5 overflow-hidden',
-            snapshot.isDragging &&
-              ((todo?.state === 'planned' && 'text-orange-300') ||
-                (todo?.state === 'ongoing' && 'text-sky-300') ||
-                (todo?.state === 'done' && 'text-green-500')),
-            snapshot.isDragging && 'outline outline-primary'
+            "relative bg-accent rounded-sm h-fit p-3 flex justify-between my-0.5 overflow-hidden group/task",
+            snapshot.isDragging && "outline outline-1 outline-biru",
+            snapshot.isDropAnimating && todo?.state !== "done" && ""
           )}>
           <div className="w-full h-full">
-            <p className="w-auto h-auto break-words">{todo?.title}</p>
-          </div>
-          <div className="flex justify-between">
-            <div className="flex items-center">
-              <button className="group" onClick={() => deleteTodo(id, state)}>
-                <TrashIcon
-                  className="text-red-500 rounded-md group-hover:bg-secondary p-0.5 transition-colors duration-300"
-                  width={24}
-                  height={24}
-                />
-              </button>
-              <Modal
-                title="Edit Task!"
-                description={
-                  <Form {...form}>
-                    <form
-                      onSubmit={form.handleSubmit(onSubmit)}
-                      className="space-y-8">
-                      <FormField
-                        control={form.control}
-                        name="task"
-                        render={({ field }) => (
-                          <FormItem className="text-bg">
-                            <FormLabel>New Task</FormLabel>
-                            <FormControl ref={inputRef}>
-                              <Input
-                                type="text"
-                                className="ring-offset-secondary ring-secondary border-secondary"
-                                placeholder="something"
-                                {...field}
-                                onClick={() => form.reset()}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <Button type="submit">Edit</Button>
-                    </form>
-                  </Form>
-                }>
-                <button className="group">
-                  <Pencil2Icon
-                    className="text-teal-50 rounded-md group-hover:bg-secondary p-0.5 transition-colors duration-300"
-                    width={24}
-                    height={24}
-                  />
-                </button>
-              </Modal>
+            <div className="h-auto break-words flex-wrap relative inline">
+              <span className="hover:underline text-[14px] leading-3">
+                {todo?.title}
+              </span>
+              <Dialog
+                open={editModal}
+                onOpenChange={setEditModal}>
+                <TooltipProvider>
+                  <Tooltip>
+                    <DialogTrigger asChild>
+                      <TooltipTrigger asChild>
+                        <button className="absolute ml-1 hover:bg-[#A1BDD914] transition-colors duration-300 rounded-md invisible group-hover/task:visible">
+                          <Pencil1Icon
+                            className="p-0.5"
+                            width={20}
+                            height={20}
+                          />
+                        </button>
+                      </TooltipTrigger>
+                    </DialogTrigger>
+                    <TooltipContent
+                      align="center"
+                      side="bottom"
+                      className="bg-primary text-accent">
+                      <span>Edit Summary</span>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Edit Task!</DialogTitle>
+                    <DialogDescription asChild>
+                      <Form {...form}>
+                        <form
+                          onSubmit={form.handleSubmit(onSubmit)}
+                          className="space-y-8">
+                          <FormField
+                            control={form.control}
+                            name="task"
+                            render={({ field }) => (
+                              <FormItem className="text-bg">
+                                <FormLabel>New Task</FormLabel>
+                                <FormControl ref={inputRef}>
+                                  <Input
+                                    type="text"
+                                    className="ring-offset-secondary ring-secondary border-secondary"
+                                    placeholder="something"
+                                    {...field}
+                                    onClick={() => form.reset()}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <Button type="submit">Edit</Button>
+                        </form>
+                      </Form>
+                    </DialogDescription>
+                  </DialogHeader>
+                </DialogContent>
+              </Dialog>
             </div>
-            <Badge variant={variant}>{todo?.state}</Badge>
           </div>
+          <button onClick={() => deleteTodo(id, state)}>
+            <TrashIcon />
+          </button>
         </div>
       )}
     </Draggable>
