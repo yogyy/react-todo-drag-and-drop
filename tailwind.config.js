@@ -21,6 +21,7 @@ module.exports = {
         primary: "#8C9BAB",
         secondary: "#161A1D",
         accent: "#22272B",
+        biru: "#85B8FF",
       },
       keyframes: {
         "accordion-down": {
