@@ -1,8 +1,9 @@
-import { Badge, Variant } from "../ui/badge";
+import { Variant } from "../ui/badge";
 import { TrashIcon, Pencil1Icon } from "@radix-ui/react-icons";
 import { DetailedHTMLProps, useRef, useState } from "react";
 import { Draggable } from "@hello-pangea/dnd";
 import { TaskStatus, useTodos } from "@/store/todoStore";
+import { useShallow } from "zustand/react/shallow";
 import {
   Tooltip,
   TooltipContent,
@@ -31,6 +32,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { TaskOrder } from "../task-order";
+import { TaskMenu } from "../task-menu";
+
 interface Task
   extends DetailedHTMLProps<
     React.HTMLAttributes<HTMLDivElement>,
@@ -52,14 +56,14 @@ const formSchema = z.object({
 });
 
 const Task = (props: Task) => {
-  const { id, variant, index, state } = props;
+  const { id, index, state } = props;
   const todo = useTodos((store) =>
     store.todos[state].find((task) => task.id === id)
   );
   const deleteTodo = useTodos((store) => store.deleteTodos);
-  const editTodo = useTodos((store) => store.editTodo);
+  const editTodo = useTodos(useShallow((store) => store.editTodo));
   const [editModal, setEditModal] = useState(false);
-
+  const setOrder = useTodos((store) => store.setCounter);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -90,19 +94,19 @@ const Task = (props: Task) => {
           {...provided.dragHandleProps}
           ref={provided.innerRef}
           className={cn(
-            "relative bg-accent rounded-sm h-fit p-3 flex justify-between my-0.5 overflow-hidden group/task",
+            "relative bg-accent rounded-sm h-fit p-3 flex justify-between my-0.5 group/task",
             snapshot.isDragging && "outline outline-1 outline-biru",
             snapshot.isDropAnimating && todo?.state !== "done" && ""
           )}>
-          <div className="w-full h-full">
-            <div className="h-auto break-words flex-wrap relative inline">
+          <div className="w-[90%] h-full">
+            <div className="h-auto w-full break-words flex-wrap relative inline">
               <span className="hover:underline text-[14px] leading-3">
                 {todo?.title}
               </span>
               <Dialog
                 open={editModal}
                 onOpenChange={setEditModal}>
-                <TooltipProvider>
+                <TooltipProvider delayDuration={150}>
                   <Tooltip>
                     <DialogTrigger asChild>
                       <TooltipTrigger asChild>
@@ -158,10 +162,9 @@ const Task = (props: Task) => {
                 </DialogContent>
               </Dialog>
             </div>
+            <TaskOrder order={todo.order} />
           </div>
-          <button onClick={() => deleteTodo(id, state)}>
-            <TrashIcon />
-          </button>
+          <TaskMenu className="flex-1" />
         </div>
       )}
     </Draggable>
