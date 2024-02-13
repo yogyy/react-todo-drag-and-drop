@@ -1,11 +1,11 @@
-import Column from '@/components/layout/column';
-import { DragDropContext, DropResult } from '@hello-pangea/dnd';
-import './App.css';
-import { useTodos } from './store/todoStore';
+import { ColumnMemo } from "@/components/layout/column";
+import { DragDropContext, DropResult } from "@hello-pangea/dnd";
+import { useTodos } from "./store/todoStore";
+import { Button } from "./components/ui/button";
 
 function App() {
-  const orderTask = useTodos(store => store.moveTaskBetweenCategories);
-
+  const orderTask = useTodos((store) => store.moveTaskBetweenCategories);
+  const resetOrderNumber = useTodos((store) => store.resetCounter);
   function handleOnDragEnd(result: DropResult) {
     const { destination, source, draggableId } = result;
     if (!destination) return;
@@ -25,11 +25,31 @@ function App() {
           To DOoooooooooooo
         </h1>
       </div>
-      <div className="flex flex-col items-center justify-center w-full md:flex-row md:items-start">
+      <div>
+        <Button
+          variant="outline"
+          className="hover:bg-accent hover:text-white"
+          onClick={() => resetOrderNumber(1)}>
+          Reset order
+        </Button>
+      </div>
+      <div className="flex flex-col items-center h-full justify-center w-full md:flex-row md:items-start overflow-x-scroll scrollbar-none md:justify-start lg:justify-center">
         <DragDropContext onDragEnd={handleOnDragEnd}>
-          <Column variant="planned" state="planned" droppableId="planned" />
-          <Column variant="ongoing" state="ongoing" droppableId="ongoing" />
-          <Column variant="done" state="done" droppableId="done" />
+          <ColumnMemo
+            variant="planned"
+            state="planned"
+            droppableId="planned"
+          />
+          <ColumnMemo
+            variant="ongoing"
+            state="ongoing"
+            droppableId="ongoing"
+          />
+          <ColumnMemo
+            variant="done"
+            state="done"
+            droppableId="done"
+          />
         </DragDropContext>
       </div>
     </div>
