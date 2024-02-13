@@ -1,5 +1,5 @@
 import React from "react";
-import { ChecboxIcon } from "./icons/checkbox";
+import { ChecboxIcon } from "../icons/checkbox";
 import { cn } from "@/lib/utils";
 import {
   Tooltip,
@@ -7,11 +7,15 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { TaskStatus } from "@/store/todoStore";
+import { CheckmarkIcon } from "../icons/checkmark";
 
 interface TaskOrderProps extends React.HTMLAttributes<HTMLDivElement> {
+  state: TaskStatus;
   order: number;
+  isDragging: boolean;
 }
-const Order = ({ order, className }: TaskOrderProps) => {
+const Order = ({ state, isDragging, order, className }: TaskOrderProps) => {
   return (
     <div className={cn("flex items-center gap-2 mt-1.5 h-8", className)}>
       <TooltipProvider delayDuration={150}>
@@ -24,10 +28,19 @@ const Order = ({ order, className }: TaskOrderProps) => {
       </TooltipProvider>
       <TooltipProvider delayDuration={150}>
         <Tooltip>
-          <TooltipTrigger className="text-xs leading-4 relative group/kan inline-flex justify-center">{`KAN-${order}`}</TooltipTrigger>
+          <TooltipTrigger
+            className={cn(
+              "text-xs leading-4 relative group/kan inline-flex justify-center",
+              state === "done" ? "line-through decoration-2" : ""
+            )}>
+            {`KAN-${order}`}
+          </TooltipTrigger>
           <TooltipContent>{`KAN-${order}`}</TooltipContent>
         </Tooltip>
       </TooltipProvider>
+      {state === "done" && !isDragging && (
+        <CheckmarkIcon className="text-green-500 absolute right-0 -mt-1" />
+      )}
     </div>
   );
 };

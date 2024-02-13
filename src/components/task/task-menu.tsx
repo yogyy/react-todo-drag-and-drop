@@ -5,8 +5,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Button, ButtonProps } from "./ui/button";
+import { Button, ButtonProps } from "../ui/button";
 import { cn } from "@/lib/utils";
+import { TaskStatus, useTodos } from "@/store/todoStore";
 
 const MenuItems = [
   { id: 1, label: "Copy Issue link" },
@@ -18,9 +19,14 @@ const MenuItems = [
   { id: 7, label: "Delete" },
 ];
 
-const Menu = ({ className, ...props }: ButtonProps) => {
+interface MenuProps extends ButtonProps {
+  taskId: string;
+  state: TaskStatus;
+}
+
+const Menu = ({ taskId, state, className, ...props }: MenuProps) => {
   const [openMenu, setOpenMenu] = React.useState(false);
-  console.log("task menu");
+  const deleteTask = useTodos((store) => store.deleteTodos);
   return (
     <Popover
       open={openMenu}
@@ -70,8 +76,17 @@ const Menu = ({ className, ...props }: ButtonProps) => {
               {item.type === "separator" ? (
                 <li className="w-full h-[1px] my-1 bg-[#3d474f]" />
               ) : (
-                <li className="w-full hover:bg-[#323940] transition-colors">
-                  <button className="px-5 py-2 flex text-left outline-none w-full focus-visible:outline-biru outline-2 -outline-offset-2">
+                <li className="w-full">
+                  <button
+                    onClick={() => {
+                      item.label === "Delete" && deleteTask(taskId, state);
+                    }}
+                    className={cn(
+                      "px-5 py-2 flex text-left outline-none w-full focus-visible:outline-biru outline-2 -outline-offset-2",
+                      item.label === "Delete"
+                        ? "cursor-pointer hover:bg-[#323940] transition-colors"
+                        : "cursor-not-allowed"
+                    )}>
                     <span className="w-full">{item.label}</span>
                   </button>
                 </li>
