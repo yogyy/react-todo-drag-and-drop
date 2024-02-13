@@ -1,14 +1,25 @@
-import { create } from 'zustand';
-import { Task, TaskStatus } from './store';
-import { v1 as uuidv1 } from 'uuid';
-import { persist } from 'zustand/middleware';
+import { create } from "zustand";
+import { v1 as uuidv1 } from "uuid";
+import { persist } from "zustand/middleware";
 
-type Todos = {
+type TaskStatus = "planned" | "ongoing" | "done" | string;
+
+interface Task {
+  title: string;
+  state: TaskStatus | string;
+  id: string;
+  order: number;
+}
+
+interface Todos {
   [category: string]: Task[];
-};
+}
 
-type Store = {
+type TodoStore = {
   todos: Todos;
+  counter: number;
+  setCounter: (id: string, newOrder: number) => void;
+  resetCounter: (counter: number) => void;
   addTodos: (title: string, state: TaskStatus) => void;
   deleteTodos: (id: string, state: TaskStatus) => void;
   editTodo: (taskId: string, newTitle: string) => void;
@@ -20,17 +31,38 @@ type Store = {
   ) => void;
 };
 // Define the store
-const useTodos = create<Store>()(
+const useTodos = create<TodoStore>()(
   persist(
-    set => ({
+    (set) => ({
       todos: {
         planned: [],
         ongoing: [],
         done: [],
       },
+      counter: 1,
+      resetCounter: (counter) => {
+        set({ counter });
+      },
+      setCounter: (id, newOrder) => {
+        set((store) => {
+          const { todos } = store;
+          for (const category in todos) {
+            const tasks = todos[category];
+            const taskToEdit = tasks.find((task) => task.id === id);
+
+            // If the task is found, update its title and break out of the loop
+            if (taskToEdit) {
+              taskToEdit.order = newOrder;
+              break;
+            }
+          }
+
+          return { todos: { ...todos } };
+        });
+      },
       addTodos: (title, state) => {
-        set(prev => {
-          const newTask = { title, state, id: uuidv1() };
+        set((prev) => {
+          const newTask = { title, state, id: uuidv1(), order: prev.counter++ };
           return {
             todos: {
               ...prev.todos,
@@ -40,21 +72,21 @@ const useTodos = create<Store>()(
         });
       },
       deleteTodos: (id, state) => {
-        set(prev => {
+        set((prev) => {
           return {
             todos: {
               ...prev.todos,
-              [state]: prev.todos[state].filter(task => task.id !== id),
+              [state]: prev.todos[state].filter((task) => task.id !== id),
             },
           };
         });
       },
       editTodo: (taskId: string, newTitle: string) => {
-        set(store => {
+        set((store) => {
           const { todos } = store;
           for (const category in todos) {
             const tasks = todos[category];
-            const taskToEdit = tasks.find(task => task.id === taskId);
+            const taskToEdit = tasks.find((task) => task.id === taskId);
 
             // If the task is found, update its title and break out of the loop
             if (taskToEdit) {
@@ -72,13 +104,13 @@ const useTodos = create<Store>()(
         targetCategory: string,
         targetIndex: number
       ) =>
-        set((store: Store) => {
+        set((store: TodoStore) => {
           const { todos } = store;
           const sourceTasks = todos[sourceCategory];
           const targetTasks = todos[targetCategory];
 
           const taskToMoveIndex = sourceTasks.findIndex(
-            task => task.id === taskId
+            (task) => task.id === taskId
           );
 
           if (
@@ -99,13 +131,8 @@ const useTodos = create<Store>()(
           return { todos: { ...todos } };
         }),
     }),
-    { name: 'to-doooo' }
+    { name: "to-doooo" }
   )
 );
 
-const modalState = create<{ open: boolean; setOpen: () => void }>(set => ({
-  open: false,
-  setOpen: () => set(state => ({ open: !state.open })),
-}));
-
-export { useTodos, modalState };
+export { useTodos, type TaskStatus };
