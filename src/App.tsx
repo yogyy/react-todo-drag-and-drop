@@ -21,9 +21,7 @@ function App() {
   return (
     <div className="flex flex-col items-center min-h-screen">
       <div className="flex items-center justify-center w-full h-20 mb-12 bg-secondary">
-        <h1 className="text-3xl font-semibold bg-gradient-to-r from-orange-500 via-sky-500 to-green-500 bg-clip-text text-transparent motion-safe:animate-gradient-x">
-          To DOoooooooooooo
-        </h1>
+        <Title />
       </div>
       <div>
         <Button

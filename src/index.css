@@ -16,3 +16,10 @@
     color-scheme: dark;
   }
 }
+
+.brand {
+  background: -webkit-linear-gradient(315deg, #42d392 25%, #6662bb);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
