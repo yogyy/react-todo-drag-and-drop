@@ -5,7 +5,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
 import { TaskStatus, useTodos } from "@/store/todoStore";
 import { PopoverArrow } from "@radix-ui/react-popover";
@@ -25,41 +24,20 @@ interface MenuProps {
   state: TaskStatus;
 }
 
-export const TaskMenu = ({ taskId, state }: MenuProps) => {
+export const Menu = ({ taskId, state }: MenuProps) => {
   const deleteTask = useTodos((store) => store.deleteTodos);
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button
-          variant="ghost"
+        <button
           aria-label="task menu"
           className={cn(
-            "px-[2px] aspect-square -mr-1 -mt-1 max-h-8 max-w-8 transition duration-300",
+            "inline-flex items-center justify-center rounded-md focus-visible:outline-none h-9 py-2 px-[2px] aspect-square -mr-1 -mt-1 max-h-8 max-w-8 transition duration-300",
             "hover:text-current hover:brightness-125 focus-visible:brightness-125 focus-visible:ring-0 group-hover/task:visible invisible group-focus-within/task:visible"
           )}
           style={{ backgroundColor: "#2C3339" }}>
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 24 24">
-            <g
-              fill="currentColor"
-              fillRule="evenodd">
-              <circle
-                cx="5"
-                cy="12"
-                r="2"></circle>
-              <circle
-                cx="12"
-                cy="12"
-                r="2"></circle>
-              <circle
-                cx="19"
-                cy="12"
-                r="2"></circle>
-            </g>
-          </svg>
-        </Button>
+          <ThreeDots />
+        </button>
       </PopoverTrigger>
       <PopoverContent
         arrowPadding={2}
@@ -93,5 +71,33 @@ export const TaskMenu = ({ taskId, state }: MenuProps) => {
         </ul>
       </PopoverContent>
     </Popover>
+  );
+};
+
+export const TaskMenu = React.memo(Menu);
+
+const ThreeDots = () => {
+  return (
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24">
+      <g
+        fill="currentColor"
+        fillRule="evenodd">
+        <circle
+          cx="5"
+          cy="12"
+          r="2"></circle>
+        <circle
+          cx="12"
+          cy="12"
+          r="2"></circle>
+        <circle
+          cx="19"
+          cy="12"
+          r="2"></circle>
+      </g>
+    </svg>
   );
 };
