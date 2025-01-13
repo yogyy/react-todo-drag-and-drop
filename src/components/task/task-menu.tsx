@@ -5,9 +5,10 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Button, ButtonProps } from "../ui/button";
+import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
 import { TaskStatus, useTodos } from "@/store/todoStore";
+import { PopoverArrow } from "@radix-ui/react-popover";
 
 const MenuItems = [
   { id: 1, label: "Copy Issue link" },
@@ -19,30 +20,24 @@ const MenuItems = [
   { id: 7, label: "Delete" },
 ];
 
-interface MenuProps extends ButtonProps {
+interface MenuProps {
   taskId: string;
   state: TaskStatus;
 }
 
-const Menu = ({ taskId, state, className, ...props }: MenuProps) => {
-  const [openMenu, setOpenMenu] = React.useState(false);
+export const TaskMenu = ({ taskId, state }: MenuProps) => {
   const deleteTask = useTodos((store) => store.deleteTodos);
   return (
-    <Popover
-      open={openMenu}
-      onOpenChange={setOpenMenu}>
+    <Popover>
       <PopoverTrigger asChild>
         <Button
           variant="ghost"
-          onClick={() => setOpenMenu((prev) => !prev)}
+          aria-label="task menu"
           className={cn(
-            "px-[2px] aspect-square -mr-1 -mt-1 max-h-8 max-w-8 hover:text-current hover:brightness-125 transition duration-300",
-            openMenu ? "visible" : " invisible",
-            " group-hover/task:visible",
-            className
+            "px-[2px] aspect-square -mr-1 -mt-1 max-h-8 max-w-8 transition duration-300",
+            "hover:text-current hover:brightness-125 focus-visible:brightness-125 focus-visible:ring-0 group-hover/task:visible invisible group-focus-within/task:visible"
           )}
-          style={{ backgroundColor: "#2C3339" }}
-          {...props}>
+          style={{ backgroundColor: "#2C3339" }}>
           <svg
             width="24"
             height="24"
@@ -67,8 +62,10 @@ const Menu = ({ taskId, state, className, ...props }: MenuProps) => {
         </Button>
       </PopoverTrigger>
       <PopoverContent
+        arrowPadding={2}
         align="end"
         className="w-fit border-[#3d474f] text-[#B6C2CF] font-extralight px-0 text-sm flex flex-col py-1 bg-[#282E33]">
+        <PopoverArrow style={{ fill: "#3d474f" }} />
         <PopoverClose className="sr-only">close</PopoverClose>
         <ul className="min-w-[12.5rem] max-h-[31.25rem] ">
           {MenuItems.map((item) => (
@@ -98,5 +95,3 @@ const Menu = ({ taskId, state, className, ...props }: MenuProps) => {
     </Popover>
   );
 };
-
-export const TaskMenu = React.memo(Menu);
