@@ -31,11 +31,11 @@ export const Menu = ({ taskId, state }: MenuProps) => {
       <PopoverTrigger asChild>
         <button
           aria-label="task menu"
+          title="task menu"
           className={cn(
             "inline-flex items-center justify-center rounded-md focus-visible:outline-none h-9 py-2 px-[2px] aspect-square -mr-1 -mt-1 max-h-8 max-w-8 transition duration-300",
             "hover:text-current hover:brightness-125 focus-visible:brightness-125 focus-visible:ring-0 group-hover/task:visible invisible group-focus-within/task:visible"
-          )}
-          style={{ backgroundColor: "#2C3339" }}>
+          )}>
           <ThreeDots />
         </button>
       </PopoverTrigger>
