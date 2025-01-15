@@ -2,6 +2,7 @@ import { ColumnMemo } from "@/components/layout/column";
 import { DragDropContext, DropResult } from "@hello-pangea/dnd";
 import { useTodos } from "./store/todoStore";
 import { Button } from "./components/ui/button";
+import { Title } from "./components/title";
 
 function App() {
   const orderTask = useTodos((store) => store.moveTaskBetweenCategories);
@@ -14,40 +15,29 @@ function App() {
       draggableId,
       source.droppableId,
       destination.droppableId,
-      destination.index
+      destination.index,
     );
   }
 
   return (
-    <div className="flex flex-col items-center min-h-screen">
-      <div className="flex items-center justify-center w-full h-20 mb-12 bg-secondary">
+    <div className="flex min-h-dvh flex-col items-center">
+      <div className="mb-12 flex h-20 w-full items-center justify-center bg-secondary">
         <Title />
       </div>
       <div>
         <Button
           variant="outline"
           className="hover:bg-accent hover:text-white"
-          onClick={() => resetOrderNumber(1)}>
+          onClick={() => resetOrderNumber(1)}
+        >
           Reset order
         </Button>
       </div>
-      <div className="flex flex-col items-center h-full justify-center w-full md:flex-row md:items-start overflow-x-scroll scrollbar-none md:justify-start lg:justify-center">
+      <div className="flex h-full w-full flex-col items-center justify-start overflow-x-scroll md:flex-row md:items-start min-[914px]:justify-center min-[914px]:overflow-x-hidden">
         <DragDropContext onDragEnd={handleOnDragEnd}>
-          <ColumnMemo
-            variant="planned"
-            state="planned"
-            droppableId="planned"
-          />
-          <ColumnMemo
-            variant="ongoing"
-            state="ongoing"
-            droppableId="ongoing"
-          />
-          <ColumnMemo
-            variant="done"
-            state="done"
-            droppableId="done"
-          />
+          <ColumnMemo variant="planned" />
+          <ColumnMemo variant="ongoing" />
+          <ColumnMemo variant="done" />
         </DragDropContext>
       </div>
     </div>

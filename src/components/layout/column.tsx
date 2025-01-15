@@ -1,5 +1,5 @@
 import React from "react";
-import { Variant } from "../ui/badge";
+import { Badge } from "../ui/badge";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Task from "../task";
 import * as z from "zod";
@@ -7,35 +7,25 @@ import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { cn } from "@/lib/utils";
 import { Droppable } from "@hello-pangea/dnd";
-import { TaskStatus, useTodos } from "@/store/todoStore";
-import { CheckmarkIcon } from "../icons/checkmark";
+import { useTodos } from "@/store/todoStore";
 import { PlusIcon } from "@radix-ui/react-icons";
 import { formSchema } from "@/lib/schema";
-import { ChecboxIcon } from "../icons/checkbox";
-import { ChevronDownIcon } from "../icons/chevrondown";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { TaskVariant } from "@/types";
 
 interface ColumnProps
   extends React.DetailedHTMLProps<
     React.HTMLAttributes<HTMLDivElement>,
     HTMLDivElement
   > {
-  state: TaskStatus;
-  variant: Variant;
-  droppableId: string;
+  variant: TaskVariant;
 }
 
 export const Column = React.forwardRef<HTMLDivElement, ColumnProps>(
-  ({ state, variant, droppableId, className }, ref) => {
+  ({ variant, className }, ref) => {
     const addTodo = useTodos((store) => store.addTodos);
-    const todos = useTodos((store) => store.todos[state]);
+    const todos = useTodos((store) => store.todos[variant]);
 
-    const [modal, setModal] = React.useState(false);
+    const [editing, setEditing] = React.useState(false);
     const title = (state: string): string => {
       switch (state) {
         case "planned":
@@ -57,78 +47,79 @@ export const Column = React.forwardRef<HTMLDivElement, ColumnProps>(
     });
     const inputRef = React.useRef<HTMLInputElement>(null);
     function onSubmit(values: z.infer<typeof formSchema>) {
-      addTodo(values.task, state);
+      addTodo(values.task, variant);
       form.reset();
-      setModal((prev) => !prev);
+      setEditing((prev) => !prev);
     }
     return (
       <div
         ref={ref}
         className={cn(
-          "bg-secondary m-1.5 h-max rounded-md group/column max-w-[282px] min-w-[282px] flex-1",
-          className
-        )}>
+          "group/column m-1.5 h-max w-4/5 min-w-[282px] flex-1 rounded-md bg-secondary md:max-w-[282px]",
+          className,
+        )}
+      >
         <div className="flex items-center justify-between px-2 py-4">
-          <div className="flex gap-1 items-center text-xs">
-            <h1 className="ml-2">{title(state)}</h1>
-            {state === "done" && <CheckmarkIcon className="text-green-500" />}
+          <div className="flex h-6 w-full items-center justify-between text-xs">
+            <Badge variant={variant} className="ml-2 font-bold">
+              <h1>• {title(variant)} •</h1>
+            </Badge>
+            <button
+              className={cn(
+                "mt-0.5 items-center rounded-md bg-secondary p-1.5 text-sm font-semibold text-white/70",
+                "transition duration-300 group-hover/column:visible hover:cursor-pointer hover:bg-accent",
+                editing ? "hidden" : "flex",
+              )}
+              onClick={() => {
+                if (inputRef.current) {
+                  setEditing((prev) => !prev);
+                  setTimeout(() => {
+                    inputRef.current?.focus();
+                  }, 0);
+                }
+              }}
+            >
+              <PlusIcon className="h-5 w-5" />
+            </button>
           </div>
         </div>
-        <Droppable droppableId={droppableId}>
+        <Droppable droppableId={variant}>
           {(provided, snapshot) => (
             <div
               {...provided.droppableProps}
               ref={provided.innerRef}
               className={cn(
-                "flex flex-col w-full h-full min-h-[15rem] p-1.5 border-transparent",
-                snapshot.isUsingPlaceholder && "border-biru border-y"
-              )}>
+                "flex h-full min-h-[15rem] w-full flex-col border-y border-transparent p-1.5",
+                snapshot.isUsingPlaceholder && "border-biru",
+              )}
+            >
               {todos.map((task, index) => (
                 <Task
                   index={index}
                   key={task.id}
                   id={task.id}
-                  variant={variant}
-                  state={state}
+                  state={variant}
                 />
               ))}
               {provided.placeholder}
-              <button
-                className={cn(
-                  "bg-secondary font-semibold text-sm text-primary items-center gap-1 p-2 mt-0.5 rounded-sm",
-                  "group-hover/column:visible hover:cursor-pointer hover:bg-accent transition duration-300",
-                  state === "planned" ? "visible" : "invisible",
-                  modal ? "hidden" : "flex",
-                  snapshot.isDraggingOver &&
-                    state !== "planned" &&
-                    "opacity-0 transition-none"
-                )}
-                onClick={() => {
-                  if (inputRef.current) {
-                    setModal((prev) => !prev);
-                    setTimeout(() => {
-                      inputRef.current?.focus();
-                    }, 0);
-                  }
-                }}>
-                <PlusIcon className="fill-current w-4 h-4" />
-                Create Issue
-              </button>
+
               <div
                 className={cn(
-                  modal === true ? "block" : "hidden",
-                  "p-2 border-2 border-biru"
-                )}>
+                  "border-2 border-biru p-2",
+                  editing === true ? "block" : "hidden",
+                )}
+              >
                 <Form {...form}>
                   <form
                     onSubmit={form.handleSubmit(onSubmit)}
-                    className={cn(" mt-0.5 rounded-sm  relative")}
-                    onBlur={() => setModal(false)}>
+                    className="relative mt-0.5 rounded-sm"
+                    onBlur={() => setEditing(false)}
+                  >
                     <FormField
                       control={form.control}
                       name="task"
                       render={({ field }) => (
-                        <FormItem className="text-bg relative">
+                        <FormItem className="relative text-bg">
                           <FormControl ref={inputRef}>
                             <textarea
                               maxLength={100}
@@ -138,10 +129,10 @@ export const Column = React.forwardRef<HTMLDivElement, ColumnProps>(
                                   form.handleSubmit(onSubmit)();
                                 }
                                 if (e.key === "Escape") {
-                                  setModal(false);
+                                  setEditing(false);
                                 }
                               }}
-                              className="scrollbar-none placeholder:text-[14px] text-[14px] bg-bg overflow-y-scroll border-none outline-none resize-none rounded-sm text-primary min-h-10 flex justify-start w-full dark"
+                              className="flex min-h-10 w-full resize-none justify-start overflow-y-scroll rounded-sm border-none bg-bg text-[14px] text-primary outline-none scrollbar-none placeholder:text-[14px]"
                               placeholder="What needs to be done?"
                               {...field}
                             />
@@ -151,24 +142,13 @@ export const Column = React.forwardRef<HTMLDivElement, ColumnProps>(
                     />
                   </form>
                 </Form>
-                <TooltipProvider delayDuration={150}>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button className="flex items-center px-1 py-0.5 -ml-1 rounded-sm hover:bg-[#282D33] mt-1">
-                        <ChecboxIcon />
-                        <ChevronDownIcon />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent>Task</TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
               </div>
             </div>
           )}
         </Droppable>
       </div>
     );
-  }
+  },
 );
 
 export const ColumnMemo = React.memo(Column);
