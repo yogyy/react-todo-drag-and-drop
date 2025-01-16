@@ -1,17 +1,15 @@
-import { Variant } from "../ui/badge";
 import React from "react";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
 import { Draggable } from "@hello-pangea/dnd";
-import { TaskStatus, useTodos } from "@/store/todoStore";
+import { useTodos } from "@/store/todoStore";
 import { cn } from "@/lib/utils";
-import { TaskOrder } from "./task-order";
 import { TaskMenu } from "./task-menu";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
-import { useForm } from "react-hook-form";
-import { Pencil1Icon } from "@radix-ui/react-icons";
 import { formSchema } from "@/lib/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { useTextarea } from "@/hooks/use-adjust-textarea";
+import { TaskVariant } from "@/types";
 
 interface Task
   extends React.DetailedHTMLProps<
@@ -19,81 +17,75 @@ interface Task
     HTMLDivElement
   > {
   id: string;
-  variant: Variant;
   index: number;
-  state: TaskStatus;
+  state: TaskVariant;
 }
 
-const Task = React.memo(function (props: Task) {
-  const { id, index, state } = props;
-  const [editModal, setEditModal] = React.useState(false);
-  const todos = useTodos((store) => store.todos);
+const Task = React.memo(function ({ id, index, state }: Task) {
+  const [editTask, setEditTask] = React.useState(false);
+  const todo = useTodos((store) =>
+    store.todos[state].find((task) => task.id === id),
+  );
+  if (!todo) return;
 
-  const todo = todos[state].find((task) => task.id === id);
   const editTodo = useTodos((store) => store.editTodo);
 
   const { textareaRef, adjustTextareaHeight } = useTextarea();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      task: todo?.title,
-    },
+    defaultValues: { task: todo?.title },
   });
-  if (!todo) {
-    return;
-  }
+
   function onSubmit(values: z.infer<typeof formSchema>) {
-    editTodo(id, values.task);
-    setEditModal((prev) => !prev);
-    form.reset();
-  }
-  if (!todo) {
-    return;
+    if (values.task.trim().length !== 0) {
+      editTodo(id, values.task);
+      setEditTask(false);
+    } else {
+      setEditTask(true);
+    }
   }
 
   return (
-    <Draggable
-      key={todo?.id}
-      draggableId={todo?.id}
-      index={index}>
+    <Draggable index={index} draggableId={todo?.id}>
       {(provided, snapshot) => (
         <div
           {...provided.draggableProps}
           {...provided.dragHandleProps}
           ref={provided.innerRef}
           className={cn(
-            "relative bg-accent rounded-sm h-fit p-3 flex justify-between my-0.5 group/task",
+            "group/task group/task relative my-0.5 flex h-fit justify-between rounded-sm bg-accent p-3",
             snapshot.isDragging && "outline outline-1 outline-biru",
-            snapshot.isDropAnimating && todo?.state !== "done" && ""
-          )}>
-          <div
-            className={cn("h-full relative", editModal ? "w-full" : "w-[87%]")}>
+          )}
+        >
+          <div className="w-[87%]">
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
                 className={cn(
-                  "p-0.5 px-2 border-2 mt-0.5 rounded-sm border-biru relative bg-bg",
-                  editModal ? "block" : "hidden"
+                  "relative w-full rounded-sm border border-biru bg-bg",
+                  editTask ? "block" : "hidden",
                 )}
-                onBlur={() => setEditModal(false)}>
+                onBlur={() => setEditTask(false)}
+              >
                 <FormField
                   control={form.control}
                   name="task"
                   render={({ field }) => (
-                    <FormItem className=" relative">
+                    <FormItem>
                       <FormControl ref={textareaRef}>
                         <textarea
                           rows={1}
                           maxLength={100}
+                          spellCheck={false}
                           onKeyDown={(e) => {
                             if (e.key === "Enter") {
                               form.handleSubmit(onSubmit)();
                             }
                             if (e.key === "Escape") {
-                              setEditModal(false);
+                              setEditTask(false);
                             }
                           }}
-                          className="scrollbar-none mt-0.5 text-[14px] bg-bg border-none outline-none resize-none rounded-sm h-10 flex justify-start w-full"
+                          className="flex h-auto w-full resize-none justify-start break-words rounded-sm border-none bg-bg pb-[2.5px] text-[14px] leading-5 outline-none scrollbar-none"
                           placeholder="What needs to be done?"
                           {...field}
                         />
@@ -103,50 +95,50 @@ const Task = React.memo(function (props: Task) {
                 />
               </form>
             </Form>
-            {!editModal && (
+            {!editTask && (
               <div
                 className={cn(
-                  "relative h-auto w-auto",
-                  editModal ? "hidden" : "flex"
-                )}>
-                <div className="hover:underline group/todo break-words text-ellipsis overflow-hidden leading-6 text-[14px]">
-                  <span>
+                  "relative w-full border border-transparent",
+                  editTask ? "hidden" : "block",
+                )}
+              >
+                <div
+                  className="overflow-hidden text-ellipsis pb-1.5 text-[14px] hover:underline"
+                  onClick={() => {
+                    if (textareaRef?.current) {
+                      setEditTask((prev) => !prev);
+                      setTimeout(() => {
+                        textareaRef.current?.focus();
+                        adjustTextareaHeight();
+                      }, 0);
+                    }
+                  }}
+                >
+                  <p
+                    className={cn(
+                      "cursor-text whitespace-pre-wrap break-words pb-[1.8px] leading-5",
+                      state === "done" ? "line-through decoration-2" : "",
+                    )}
+                  >
                     {todo.title}
-                    <button
-                      onClick={() => {
-                        if (textareaRef?.current) {
-                          setEditModal((prev) => !prev);
-                          setTimeout(() => {
-                            textareaRef.current?.focus();
-                            adjustTextareaHeight();
-                          }, 0);
-                        }
-                      }}
-                      className={cn(
-                        "absolute ml-1 bg-accent hover:bg-[#2B333A] transition-colors duration-300 rounded-md invisible group-hover/task:visible"
-                      )}>
-                      <div className="w-6 h-6 flex items-center justify-center">
-                        <Pencil1Icon
-                          width={20}
-                          height={20}
-                        />
-                      </div>
-                    </button>
-                  </span>
+                  </p>
                 </div>
               </div>
             )}
-            <TaskOrder
-              state={state}
-              isDragging={snapshot.isDragging}
-              order={todo.order}
-            />
+            <div className="mt-1.5 flex h-8 w-full items-center justify-between gap-2">
+              <span
+                className={cn(
+                  "relative inline-flex justify-center text-[0.65rem] leading-4 text-opacity-70",
+                  state === "planned" && "text-orange-300",
+                  state === "ongoing" && "text-sky-300",
+                  state === "done" && "text-green-500",
+                )}
+              >
+                {`KAN-${todo.order}`}
+              </span>
+            </div>
           </div>
-          <TaskMenu
-            state={state}
-            taskId={todo.id}
-            className={cn(editModal ? "hidden" : "flex-1 w-[13%]")}
-          />
+          <TaskMenu state={state} taskId={todo.id} />
         </div>
       )}
     </Draggable>
