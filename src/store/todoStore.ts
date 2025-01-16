@@ -1,12 +1,11 @@
+import { nanoid } from "nanoid";
 import { create } from "zustand";
-import { v1 as uuidv1 } from "uuid";
+import { TaskVariant } from "@/types";
 import { persist } from "zustand/middleware";
-
-type TaskStatus = "planned" | "ongoing" | "done" | string;
 
 interface Task {
   title: string;
-  state: TaskStatus | string;
+  state: TaskVariant | string;
   id: string;
   order: number;
 }
@@ -20,14 +19,14 @@ type TodoStore = {
   counter: number;
   setCounter: (id: string, newOrder: number) => void;
   resetCounter: (counter: number) => void;
-  addTodos: (title: string, state: TaskStatus) => void;
-  deleteTodos: (id: string, state: TaskStatus) => void;
+  addTodos: (title: string, state: TaskVariant) => void;
+  deleteTodos: (id: string, state: TaskVariant) => void;
   editTodo: (taskId: string, newTitle: string) => void;
   moveTaskBetweenCategories: (
     taskId: string,
     sourceCategory: string,
     targetCategory: string,
-    targetIndex: number
+    targetIndex: number,
   ) => void;
 };
 // Define the store
@@ -40,9 +39,7 @@ const useTodos = create<TodoStore>()(
         done: [],
       },
       counter: 1,
-      resetCounter: (counter) => {
-        set({ counter });
-      },
+      resetCounter: (counter) => set({ counter }),
       setCounter: (id, newOrder) => {
         set((store) => {
           const { todos } = store;
@@ -62,7 +59,7 @@ const useTodos = create<TodoStore>()(
       },
       addTodos: (title, state) => {
         set((prev) => {
-          const newTask = { title, state, id: uuidv1(), order: prev.counter++ };
+          const newTask = { title, state, id: nanoid(), order: prev.counter++ };
           return {
             todos: {
               ...prev.todos,
@@ -102,7 +99,7 @@ const useTodos = create<TodoStore>()(
         taskId: string,
         sourceCategory: string,
         targetCategory: string,
-        targetIndex: number
+        targetIndex: number,
       ) =>
         set((store: TodoStore) => {
           const { todos } = store;
@@ -110,7 +107,7 @@ const useTodos = create<TodoStore>()(
           const targetTasks = todos[targetCategory];
 
           const taskToMoveIndex = sourceTasks.findIndex(
-            (task) => task.id === taskId
+            (task) => task.id === taskId,
           );
 
           if (
@@ -131,8 +128,8 @@ const useTodos = create<TodoStore>()(
           return { todos: { ...todos } };
         }),
     }),
-    { name: "to-doooo" }
-  )
+    { name: "to-doooo" },
+  ),
 );
 
-export { useTodos, type TaskStatus };
+export { useTodos };
