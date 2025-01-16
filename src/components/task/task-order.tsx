@@ -6,11 +6,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { TaskStatus } from "@/store/todoStore";
 import { CheckmarkIcon } from "../icons/checkmark";
+import { TaskVariant } from "@/types";
 
 interface TaskOrderProps {
-  state: TaskStatus;
+  state: TaskVariant;
   order: number;
 }
 const Order = ({ state, order }: TaskOrderProps) => {
