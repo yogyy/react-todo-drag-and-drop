@@ -15,6 +15,9 @@
     font-family: SF;
     color-scheme: dark;
   }
+  textarea {
+    field-sizing: content;
+  }
 }
 
 .brand {
