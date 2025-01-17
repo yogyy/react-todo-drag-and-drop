@@ -1,1 +1,3 @@
-# Re-Creating react-todo with zustand
+# dnd-todo
+
+powered by @hello-pangea/dnd
